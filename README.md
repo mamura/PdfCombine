@@ -1,14 +1,12 @@
 # PdfCombine
-
-Package for combining PDF files in PHP.
+Combine PDF files in PHP and Laravel.
 
 ## Installation
-
 ```bash
 composer require mamura/pdf-combine
 ```
 
-# Basic usage
+## Basic usage
 ```php
 use Mamura\PdfCombine\DTO\CombinePdfData;
 use Mamura\PdfCombine\Services\CombineDocuments;
@@ -27,6 +25,10 @@ $output = $service->handle(
 );
 ```
 
-# Laravel
-The package supports Laravel auto-discovery.
+## Laravel
+This package supports Laravel auto-discovery.
 
+## Testing
+```bash
+vendor/bin/phpunit
+```
