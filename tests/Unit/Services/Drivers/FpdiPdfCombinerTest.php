@@ -42,4 +42,18 @@ final class FpdiPdfCombinerTest extends TestCase
         $this->assertFileExists($output);
         $this->assertGreaterThan(0, filesize($output));
     }
+
+    public function test_it_throws_exception_when_file_does_not_exist(): void
+    {
+        $driver = new FpdiPdfCombiner();
+
+        $this->expectException(FileNotFoundException::class);
+
+        $driver->combine(
+            new CombinePdfData(
+                files: [__DIR__ . '/../../../Fixtures/pdfs/not-found.pdf'],
+                outputPath: sys_get_temp_dir() . '/merged.pdf'
+            )
+        );
+    }
 }
