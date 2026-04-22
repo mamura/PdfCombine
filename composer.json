@@ -1,0 +1,26 @@
+{
+  "name": "mamura/pdf-combine",
+  "description": "Package for combining PDF files in PHP",
+  "type": "library",
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "Mamura\\PdfCombine\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Mamura\\PdfCombine\\Tests\\": "tests/"
+    }
+  },
+  "require": {
+    "php": "^8.2"
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Mamura\\PdfCombine\\Laravel\\PdfCombineServiceProvider"
+      ]
+    }
+  }
+}
