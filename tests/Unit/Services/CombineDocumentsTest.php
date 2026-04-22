@@ -31,4 +31,15 @@ final class CombineDocumentsTest extends TestCase
 
         $this->assertSame('/tmp/merged.pdf', $result);
     }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        $file = sys_get_temp_dir() . '/merged-test.pdf';
+
+        if (file_exists($file)) {
+            unlink($file);
+        }
+    }
 }
