@@ -1,0 +1,17 @@
+# Dependências
+/vendor/
+
+# Arquivos gerados
+*.log
+*.cache
+
+# IDEs
+/.idea/
+/.vscode/
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# PDFs (regra geral)
+*.pdf
