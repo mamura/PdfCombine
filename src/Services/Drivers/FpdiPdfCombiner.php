@@ -24,9 +24,62 @@ final class FpdiPdfCombiner implements PdfCombinerInterface
 
         $pdf = new Fpdi();
 
-        foreach ($data->files as $file) {
+        $pageMap = $this->buildPageMap($data->files);
+        $totalPages = count($pageMap);
+        $currentPage = 1;
+        $currentSourceFile = null;
+
+        foreach ($pageMap as $pageData) {
             try {
-                $pageCount = $pdf->setSourceFile($file);
+                if ($currentSourceFile !== $pageData['file']) {
+                    $pdf->setSourceFile($pageData['file']);
+                    $currentSourceFile = $pageData['file'];
+                }
+
+                $template = $pdf->importPage($pageData['page']);
+                $size = $pdf->getTemplateSize($template);
+            } catch (\Throwable $exception) {
+                throw new InvalidPdfException(
+                    sprintf('Invalid PDF file: %s', $pageData['file']),
+                    previous: $exception
+                );
+            }
+
+            $orientation = $size['width'] > $size['height'] ? 'L' : 'P';
+
+            $pdf->AddPage($orientation, [$size['width'], $size['height']]);
+            $pdf->useTemplate($template);
+
+            if ($data->addPageNumbers) {
+                $this->addPageNumber(
+                    $pdf,
+                    $currentPage,
+                    $totalPages,
+                    (float) $size['width'],
+                    (float) $size['height']
+                );
+            }
+
+            $currentPage++;
+        }
+
+        $pdf->Output('F', $outputPath);
+
+        return $outputPath;
+    }
+
+    /**
+     * @param array<int, string> $files
+     * @return array<int, array{file: string, page: int}>
+     */
+    private function buildPageMap(array $files): array
+    {
+        $probe = new Fpdi();
+        $pages = [];
+
+        foreach ($files as $file) {
+            try {
+                $pageCount = $probe->setSourceFile($file);
             } catch (\Throwable $exception) {
                 throw new InvalidPdfException(
                     sprintf('Invalid PDF file: %s', $file),
@@ -35,19 +88,34 @@ final class FpdiPdfCombiner implements PdfCombinerInterface
             }
 
             for ($page = 1; $page <= $pageCount; $page++) {
-                $template = $pdf->importPage($page);
-                $size = $pdf->getTemplateSize($template);
-
-                $orientation = $size['width'] > $size['height'] ? 'L' : 'P';
-
-                $pdf->AddPage($orientation, [$size['width'], $size['height']]);
-                $pdf->useTemplate($template);
+                $pages[] = [
+                    'file' => $file,
+                    'page' => $page,
+                ];
             }
         }
 
-        $pdf->Output('F', $outputPath);
+        return $pages;
+    }
 
-        return $outputPath;
+    private function addPageNumber(
+        Fpdi $pdf,
+        int $currentPage,
+        int $totalPages,
+        float $pageWidth,
+        float $pageHeight
+    ): void {
+        $text = sprintf('Página %d de %d', $currentPage, $totalPages);
+
+        $pdf->SetFont('Arial', '', 9);
+        $pdf->SetTextColor(80, 80, 80);
+
+        $textWidth = $pdf->GetStringWidth($text);
+        $x = ($pageWidth - $textWidth) / 2;
+        $y = $pageHeight - 10;
+
+        $pdf->SetXY($x, $y);
+        $pdf->Cell($textWidth, 5, $text);
     }
 
     private function ensureOutputDirectoryExists(string $directory): void
