@@ -15,3 +15,5 @@ Thumbs.db
 
 # PDFs (regra geral)
 *.pdf
+
+!tests/Fixtures/pdfs/*.pdf
