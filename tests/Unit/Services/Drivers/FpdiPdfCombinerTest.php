@@ -56,4 +56,40 @@ final class FpdiPdfCombinerTest extends TestCase
             )
         );
     }
+
+    public function test_it_throws_exception_when_file_is_not_a_pdf(): void
+    {
+        $driver = new FpdiPdfCombiner();
+
+        $this->expectException(\Mamura\PdfCombine\Exceptions\InvalidPdfException::class);
+
+        $driver->combine(
+            new CombinePdfData(
+                files: [__DIR__ . '/../../../Fixtures/files/invalid.txt'],
+                outputPath: sys_get_temp_dir() . '/merged.pdf'
+            )
+        );
+    }
+
+    public function test_it_creates_output_directory_when_it_does_not_exist(): void
+    {
+        $driver = new FpdiPdfCombiner();
+
+        $directory = sys_get_temp_dir() . '/pdf-combine-tests/' . uniqid();
+        $output = $directory . '/merged.pdf';
+
+        $result = $driver->combine(
+            new CombinePdfData(
+                files: [
+                    __DIR__ . '/../../../Fixtures/pdfs/a.pdf',
+                    __DIR__ . '/../../../Fixtures/pdfs/b.pdf',
+                ],
+                outputPath: $output
+            )
+        );
+
+        $this->assertSame($output, $result);
+        $this->assertDirectoryExists($directory);
+        $this->assertFileExists($output);
+    }
 }
