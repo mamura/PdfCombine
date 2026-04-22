@@ -14,13 +14,24 @@
     }
   },
   "require": {
-    "php": "^8.2"
+    "php": "^8.2",
+    "setasign/fpdf": "^1.8",
+    "setasign/fpdi": "^2.5"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^11.0",
+    "orchestra/testbench": "^10.0"
   },
   "extra": {
     "laravel": {
       "providers": [
         "Mamura\\PdfCombine\\Laravel\\PdfCombineServiceProvider"
-      ]
+      ],
+      "aliases": {
+        "PdfCombine": "Mamura\\PdfCombine\\Laravel\\Facades\\PdfCombine"
+      }
     }
-  }
+  },
+    "minimum-stability": "stable",
+    "prefer-stable": true
 }
